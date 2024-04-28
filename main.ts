@@ -1,25 +1,30 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { parseCsv } from 'csv';
+import { App, Editor, MarkdownView, Modal, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 // Remember to rename these classes and interfaces!
 
-interface MyPluginSettings {
+interface BookKeeperSettings {
 	mySetting: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: BookKeeperSettings = {
 	mySetting: 'default'
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class BookKeeper extends Plugin {
+	settings: BookKeeperSettings;
+	
+	startApp() {
+		const modal = new ImportSelectionModal(this.app);
+		modal.open();
+	}
 
 	async onload() {
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+			this.startApp();
 		});
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
@@ -91,6 +96,34 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
+class ImportSelectionModal extends Modal {
+	constructor(app: App) {
+		super(app);
+	}
+	
+	onOpen() {
+		const importFile = new Setting(this.contentEl).setName("Select CSV file to import");
+		const importDataFile = importFile.controlEl.createEl("input", {
+			attr: {
+				"type": "file",
+				"multiple": false,
+				"accept": ".csv,.txt,.tsv"
+			}
+		});
+		// const triggerImport = new Setting(this.contentEl).setName("Import").setDesc("Start Import");
+		const triggerBtn = importFile.controlEl.createEl("button");
+		triggerBtn.textContent = "Start Import";
+		triggerBtn.onclick = async () => {
+			const {files:data_files_list} = importDataFile;
+			if (data_files_list == null) { return ;}
+			for (var i = 0; i < data_files_list.length; i++) {
+			    var content = await data_files_list[i].text();
+				console.log(parseCsv(content));
+			}
+		}
+	}
+}
+
 class SampleModal extends Modal {
 	constructor(app: App) {
 		super(app);
@@ -108,9 +141,9 @@ class SampleModal extends Modal {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+	plugin: BookKeeper;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: BookKeeper) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
