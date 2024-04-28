@@ -1,8 +1,6 @@
-import { parse } from 'csv-parse';
 import * as fs from "fs";
-import { finished } from 'stream/promises';
 
-class Row {
+export class Row {
   
   Date: Date
   Amount: Number
@@ -10,8 +8,12 @@ class Row {
   Balance: Number
   Tags: string[]
   
-  constructor(date_string: string, amount: string, vendor: string, balance: string, tags?: string[]) {
-      this.Date = new Date(date_string.split('/').reverse().join('-'));
+  constructor(settings: any) {
+	  return this
+  }
+  
+  new(date_string: string, amount: string, vendor: string, balance: string, tags?: string[]) {
+      this.Date = new Date(date_string.split('/').reverse().join('-')); // Need to be able to configure the date format
       this.Amount = parseFloat(amount);
       this.Vendor = vendor;
       this.Balance = parseFloat(balance);   
@@ -22,7 +24,7 @@ class Row {
 	  }
   }
   
-  header(): string {
+  header(): string { // Need to get the headers from the file or configure the file
     
     const headings = "| Date | Amount | Vendor | Balance | Tags |";
     const separator = "|---|---|---|---|---| ";
@@ -31,8 +33,8 @@ class Row {
 
   }
   
-  toMarkdown(): String {
-    return "|" + [this.Date.toISOString(), this.Amount, this.Vendor, this.Balance, this.Tags.join(" ")].join("|") + "\n"
+  toMarkdown(): string {
+    return "|" + [this.Date.toLocaleDateString(), this.Amount, this.Vendor, this.Balance, this.Tags.join(" ")].join("|")
   }
   
 }
@@ -44,26 +46,16 @@ function clean_string(x: string): string {
 function rowFromString(value: string, sep: string): Row {
 	const values = value.split(sep).map(clean_string);
 	const tags = value.length >= 5 ? values.slice(4, values.length + 1) : undefined;
-	return new Row(values[0], values[1], values[2], values[3], tags); 
+	const rec = new Row(null)
+	rec.new(values[0], values[1], values[2], values[3], tags); 
+	return rec
 }
 
 export function parseCsv(contents: string, sep: string = ',', line: string = '\r'): Row[] {
 	const rows: Row[] = contents.split(line).map(rec => rowFromString(rec, sep));
+	rows.pop(); // Ignore the trailing last lines
 	return rows
 	
-}
-
-async function loadCsv(filepath: fs.PathLike, headers: string[]): Promise<Row[]> {
-  const records: Row[] = [];
-  const parser = fs.createReadStream(filepath).pipe(parse({columns: headers})); 
-  parser.on('readable', ()=>{
-    let record; while ((record = parser.read()) != null) {
-      const r = new Row(record.Date, record.Amount, record.Vendor, record.Balance);
-      records.push(r);
-    }
-  })
-  await finished(parser);
-  return records;
 }
 
 async function writeLedger(filepath: fs.PathLike, rows: Row[]): Promise<void> {

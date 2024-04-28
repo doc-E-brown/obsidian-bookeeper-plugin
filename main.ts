@@ -1,4 +1,4 @@
-import { parseCsv } from 'csv';
+import { parseCsv, Row } from 'csv';
 import { App, Editor, MarkdownView, Modal, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 // Remember to rename these classes and interfaces!
@@ -18,7 +18,7 @@ export default class BookKeeper extends Plugin {
 		const modal = new ImportSelectionModal(this.app);
 		modal.open();
 	}
-
+	
 	async onload() {
 		await this.loadSettings();
 
@@ -35,10 +35,25 @@ export default class BookKeeper extends Plugin {
 
 		// This adds a simple command that can be triggered anywhere
 		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
+			id: 'bookkeeper-load-data-here',
+			name: 'Load data into this page',
+			editorCallback: (editor: Editor) => {
+				const modal = new ImportSelectionModal(this.app);
+				async function cb(rows: Row[]) {
+					if (rows.length == 0) {return;}
+					for (let i = 0; i < rows.length; i++) {
+						const rec = rows[i];
+						const row = rec.toMarkdown();
+					}
+					let content = rows.map(rec => rec.toMarkdown()).join("\n");
+					content = rows[0].header() + content;
+					
+					editor.replaceRange(content, editor.getCursor());
+					modal.close();
+					
+				}
+				modal.setHandler(cb);
+				modal.open();
 			}
 		});
 		// This adds an editor command that can perform some operation on the current editor instance
@@ -96,9 +111,17 @@ export default class BookKeeper extends Plugin {
 	}
 }
 
+export type ImportHandler = (rows: Row[]) => Promise<void>;
+
 class ImportSelectionModal extends Modal {
+	handler: ImportHandler 
+	
 	constructor(app: App) {
 		super(app);
+	}
+	
+	setHandler(handler: ImportHandler) {
+		this.handler = handler;
 	}
 	
 	onOpen() {
@@ -115,12 +138,17 @@ class ImportSelectionModal extends Modal {
 		triggerBtn.textContent = "Start Import";
 		triggerBtn.onclick = async () => {
 			const {files:data_files_list} = importDataFile;
-			if (data_files_list == null) { return ;}
-			for (var i = 0; i < data_files_list.length; i++) {
-			    var content = await data_files_list[i].text();
-				console.log(parseCsv(content));
-			}
+			if (data_files_list == null || data_files_list.length === 0) { return ;}
+			// For now only do one file
+			var content = await data_files_list[0].text();
+			const rows: Row[] = parseCsv(content);
+			await this.handler(rows);
 		}
+	}
+	
+	onClose(): void {
+		const {contentEl} = this;
+		contentEl.empty();
 	}
 }
 
