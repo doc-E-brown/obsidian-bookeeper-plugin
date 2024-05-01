@@ -1,7 +1,8 @@
 import { App, PluginSettingTab } from "obsidian";
-import BookKeeper from "../main";
+import BookKeeper from "../../main";
+import { BookKeeperColumnConfig, BookKeeperFormat, BookKeeperTableConfig } from "../Data/DataModel";
 
-class BookKeeperSettings extends PluginSettingTab {
+export class BookKeeperSettingsTab extends PluginSettingTab {
 	plugin: BookKeeper;
 
 	constructor(app: App, plugin: BookKeeper) {
@@ -16,4 +17,29 @@ class BookKeeperSettings extends PluginSettingTab {
 	}
 }
 
-export default BookKeeperSettings;
+
+export default interface BookKeeperSettings {
+	tableConfigurations: BookKeeperTableConfig[]
+}
+
+export class DefaultBookKeeperSettings implements BookKeeperSettings{
+	tableConfigurations: BookKeeperTableConfig[]; 
+
+	constructor() {
+		const date: BookKeeperColumnConfig = {key: "Date", format: BookKeeperFormat.date};
+		const amount: BookKeeperColumnConfig = {key: "Amount", format: BookKeeperFormat.number};
+		const vendor: BookKeeperColumnConfig = {key: "Vendor", format: BookKeeperFormat.label};
+		const balance: BookKeeperColumnConfig = {key: "Balance", format: BookKeeperFormat.number};
+		const tags: BookKeeperColumnConfig = {key: "Tags", format: BookKeeperFormat.number};
+		
+		this.tableConfigurations = [
+			{
+				name: "Default Configuration",
+				columns: [
+					date, amount, vendor, balance, tags
+				]
+			}
+		]
+	}
+
+}

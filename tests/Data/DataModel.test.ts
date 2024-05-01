@@ -1,13 +1,14 @@
 import { describe, expect, test } from "@jest/globals";
 import {
-	BookKeeperCellConfigIface,
+	BookKeeperColumnConfig,
 	BookKeeperFormat,
-	BookKeeperTableConfigIface,
+	BookKeeperTableConfig,
+	parseFormat,
 } from "../../src/Data/DataModel";
 
 describe("SerDe DataModel", () => {
 	test("Save cell config to string", () => {
-		const config: BookKeeperCellConfigIface = {
+		const config: BookKeeperColumnConfig = {
 			key: "col1",
 			format: BookKeeperFormat.date,
 		};
@@ -15,25 +16,25 @@ describe("SerDe DataModel", () => {
 	});
 
 	test("Load config from string", () => {
-		const str_config = '{"key":"amount","format":"currency"}';
+		const str_config = '{"key":"amount","format":"number"}';
 
-		const config: BookKeeperCellConfigIface = JSON.parse(str_config);
+		const config: BookKeeperColumnConfig = JSON.parse(str_config);
 		expect(config).toStrictEqual({
 			key: "amount",
-			format: BookKeeperFormat.currency,
+			format: BookKeeperFormat.number,
 		});
 	});
 
 	test("Save table config to string", () => {
-		const col1: BookKeeperCellConfigIface = {
+		const col1: BookKeeperColumnConfig = {
 			key: "col1",
 			format: BookKeeperFormat.date,
 		};
-		const col2: BookKeeperCellConfigIface = {
+		const col2: BookKeeperColumnConfig = {
 			key: "col2",
 			format: BookKeeperFormat.label
 		};
-		const table: BookKeeperTableConfigIface  = {
+		const table: BookKeeperTableConfig  = {
 			name: "tmpTable",
 			columns: [col1, col2]
 		}
@@ -43,16 +44,24 @@ describe("SerDe DataModel", () => {
 	});
 	
 	test("Load table config from string", () => {
-		const col1: BookKeeperCellConfigIface = {
+		const col1: BookKeeperColumnConfig = {
 			key: "vendor",
 			format: BookKeeperFormat.label,
 		};
-		const col2: BookKeeperCellConfigIface = {
+		const col2: BookKeeperColumnConfig = {
 			key: "tags",
 			format: BookKeeperFormat.tag
 		};
 		const config_str = "{\"name\":\"someTable\",\"columns\":[" + JSON.stringify(col1) + "," + JSON.stringify(col2) + "]}"
-		const table: BookKeeperTableConfigIface = JSON.parse(config_str);
+		const table: BookKeeperTableConfig = JSON.parse(config_str);
 		expect(table).toStrictEqual({name: "someTable", columns: [col1, col2]})
 	});
+	
+	test("Load tags from string", () => {
+		const raw = "#bookkeeper/expense#bookkeeper/phone"
+		
+		const result = parseFormat(raw, BookKeeperFormat.tag);
+		expect(result).toStrictEqual(["#bookkeeper/expense", "#bookkeeper/phone"])
+
+	})
 });
