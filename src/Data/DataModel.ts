@@ -1,4 +1,4 @@
-export enum BookKeeperFormat {
+export enum DataWranglerFormat {
 	label = "label",
 	date = "date",
 	// currency = "currency",
@@ -8,44 +8,45 @@ export enum BookKeeperFormat {
 	
 const stripQuotes = (val: string) => { return val.replace(/^"(.+(?="$))"$/, '$1'); }
 	
-export function parseFormat(value: string, format: BookKeeperFormat) : Date | number | string | string[] | void[] {
+export function parseFormat(value: string, format: DataWranglerFormat) : Date | number | string | string[] | void[] {
 	switch(format) {
 
-	case BookKeeperFormat.label: return stripQuotes(value);
-	case BookKeeperFormat.number: return parseFloat(stripQuotes(value)); 
-	case BookKeeperFormat.date: return new Date(value); 
-	case BookKeeperFormat.tag: return stripQuotes(value).split("#").map((tag, idx, tags) => {
+	case DataWranglerFormat.label: return stripQuotes(value);
+	case DataWranglerFormat.number: return parseFloat(stripQuotes(value)); 
+	// TODO, extra date configuration
+	case DataWranglerFormat.date: return new Date(value.split("/").reverse().join("-")); 
+	case DataWranglerFormat.tag: return stripQuotes(value).split("#").map((tag, idx, tags) => {
 		if (tag) {return "#" + stripQuotes(tag)}
 	}).filter((val, idx, tag) => val);
 }
 }
 	
-export interface BookKeeperColumnConfig {
+export interface DataWranglerColumnConfig {
 	key: string;
-	format: BookKeeperFormat;
+	format: DataWranglerFormat;
 }
 
-export interface BookKeeperCell{
-	config: BookKeeperColumnConfig;
+export interface DataWranglerCell{
+	config: DataWranglerColumnConfig;
 	/* eslint-disable  @typescript-eslint/no-explicit-any */
 	value?: any;
 }
 
-export type BookKeeperRow = BookKeeperCell[];
+export type DataWranglerRow = DataWranglerCell[];
 
-export interface BookKeeperTableConfig {
+export interface DataWranglerTableConfig {
 	name: string,
-	columns: BookKeeperColumnConfig[];
+	columns: DataWranglerColumnConfig[];
 }
 
-export interface BookKeeperTable {
+export interface DataWranglerTable {
 	name: string;
-	config: BookKeeperTableConfig;
-	contents: BookKeeperRow[];
-	toMarkdown(this): string
+	config: DataWranglerTableConfig;
+	contents: DataWranglerRow[];
+	toMarkdown(): string
 }
 
-export interface LoadBookKeeperTable {
-	loadFromString(content: String, config: BookKeeperTableConfig, colSep: string, lineSep: string)
+export interface LoadDataWranglerTable {
+	loadFromString(content: String, config: DataWranglerTableConfig, colSep: string, lineSep: string)
 }
 

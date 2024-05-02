@@ -1,9 +1,10 @@
+import { cloneDeep } from "lodash";
 import { App, Plugin, PluginManifest } from "obsidian";
-import { LoadDataCurrentFileCommand } from "./src/Obsidian/Commands";
-import BookKeeperSettings, { BookKeeperSettingsTab, DefaultBookKeeperSettings } from "./src/Obsidian/Settings";
+import { CreateDataFileCommand, CreateDataPageCallback, LoadDataCurrentFileCommand } from "./src/Obsidian/Commands";
+import DataWranglerSettings, { DataWranglerSettingsTab, DefaultDataWranglerSettings } from "./src/Obsidian/Settings";
 
-export default class BookKeeper extends Plugin {
-	settings: BookKeeperSettings
+export default class DataWrangler extends Plugin {
+	settings: DataWranglerSettings
 	
 	
 	constructor(app: App, manifest: PluginManifest) {
@@ -15,17 +16,25 @@ export default class BookKeeper extends Plugin {
 		await this.loadSettings();
 
 		// Add the settings tab
-		this.addSettingTab(new BookKeeperSettingsTab(this.app, this));
+		this.addSettingTab(new DataWranglerSettingsTab(this.app, this));
 
-		// Add a simple command
+		// Add a slash commands
 		this.addCommand(LoadDataCurrentFileCommand);
+		this.addCommand(CreateDataFileCommand);
+		
+		// Add a ribbon command
+		this.addRibbonIcon("file-spreadsheet", "Create new datawrangler page", (_evt) => {CreateDataPageCallback(this.app, this)})
 	}
 
 	onunload(): void {}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, new DefaultBookKeeperSettings(), await this.loadData());
-		console.log(this.settings)
+		const savedData = await this.loadData();
+		if (!savedData) {
+			this.settings = cloneDeep(new DefaultDataWranglerSettings())
+		} else {
+			this.settings = savedData
+		}
 	}
 	
 	async saveSettings() {

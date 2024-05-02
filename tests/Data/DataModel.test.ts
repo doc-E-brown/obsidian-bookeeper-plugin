@@ -1,16 +1,16 @@
 import { describe, expect, test } from "@jest/globals";
 import {
-	BookKeeperColumnConfig,
-	BookKeeperFormat,
-	BookKeeperTableConfig,
+	DataWranglerColumnConfig,
+	DataWranglerFormat,
+	DataWranglerTableConfig,
 	parseFormat,
 } from "../../src/Data/DataModel";
 
 describe("SerDe DataModel", () => {
 	test("Save cell config to string", () => {
-		const config: BookKeeperColumnConfig = {
+		const config: DataWranglerColumnConfig = {
 			key: "col1",
-			format: BookKeeperFormat.date,
+			format: DataWranglerFormat.date,
 		};
 		expect(JSON.stringify(config)).toBe('{"key":"col1","format":"date"}');
 	});
@@ -18,23 +18,23 @@ describe("SerDe DataModel", () => {
 	test("Load config from string", () => {
 		const str_config = '{"key":"amount","format":"number"}';
 
-		const config: BookKeeperColumnConfig = JSON.parse(str_config);
+		const config: DataWranglerColumnConfig = JSON.parse(str_config);
 		expect(config).toStrictEqual({
 			key: "amount",
-			format: BookKeeperFormat.number,
+			format: DataWranglerFormat.number,
 		});
 	});
 
 	test("Save table config to string", () => {
-		const col1: BookKeeperColumnConfig = {
+		const col1: DataWranglerColumnConfig = {
 			key: "col1",
-			format: BookKeeperFormat.date,
+			format: DataWranglerFormat.date,
 		};
-		const col2: BookKeeperColumnConfig = {
+		const col2: DataWranglerColumnConfig = {
 			key: "col2",
-			format: BookKeeperFormat.label
+			format: DataWranglerFormat.label
 		};
-		const table: BookKeeperTableConfig  = {
+		const table: DataWranglerTableConfig  = {
 			name: "tmpTable",
 			columns: [col1, col2]
 		}
@@ -44,24 +44,24 @@ describe("SerDe DataModel", () => {
 	});
 	
 	test("Load table config from string", () => {
-		const col1: BookKeeperColumnConfig = {
+		const col1: DataWranglerColumnConfig = {
 			key: "vendor",
-			format: BookKeeperFormat.label,
+			format: DataWranglerFormat.label,
 		};
-		const col2: BookKeeperColumnConfig = {
+		const col2: DataWranglerColumnConfig = {
 			key: "tags",
-			format: BookKeeperFormat.tag
+			format: DataWranglerFormat.tag
 		};
 		const config_str = "{\"name\":\"someTable\",\"columns\":[" + JSON.stringify(col1) + "," + JSON.stringify(col2) + "]}"
-		const table: BookKeeperTableConfig = JSON.parse(config_str);
+		const table: DataWranglerTableConfig = JSON.parse(config_str);
 		expect(table).toStrictEqual({name: "someTable", columns: [col1, col2]})
 	});
 	
 	test("Load tags from string", () => {
-		const raw = "#bookkeeper/expense#bookkeeper/phone"
+		const raw = "#datawrangler/expense#datawrangler/phone"
 		
-		const result = parseFormat(raw, BookKeeperFormat.tag);
-		expect(result).toStrictEqual(["#bookkeeper/expense", "#bookkeeper/phone"])
+		const result = parseFormat(raw, DataWranglerFormat.tag);
+		expect(result).toStrictEqual(["#datawrangler/expense", "#datawrangler/phone"])
 
 	})
 });

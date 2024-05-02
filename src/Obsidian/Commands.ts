@@ -1,23 +1,46 @@
-import { Editor, MarkdownFileInfo, MarkdownView } from "obsidian";
+import { App, Editor, MarkdownFileInfo, MarkdownView } from "obsidian";
+import DataWrangler from "../../main";
+import { PLUGIN_NAME } from "../constants";
+import { ImportDataModal } from "./Modals";
 
-export const BOOKKEEPER_CMD_PREFIX = "bookkeeper";
 
 type EditorCallback = (
 	editor: Editor,
 	context: MarkdownView | MarkdownFileInfo,
 ) => void;
-export interface EditorCommand {
+
+type ModalCallback = (
+	app: App,
+	context: DataWrangler
+) => void
+
+export interface DataWranglerCommand {
 	id: string;
 	name: string;
-	editorCallback: EditorCallback;
+	callBack: EditorCallback | ModalCallback;
 }
 
-export const LoadDataCurrentFileCommand: EditorCommand = {
-	id: BOOKKEEPER_CMD_PREFIX + "-load-data-current-file",
+export const LoadDataCurrentFileCommand: DataWranglerCommand = {
+	id: PLUGIN_NAME + "-load-data-current-file",
 	name: "Load Data In The Current File",
-	editorCallback: (editor: Editor) => {
+	callBack: (editor: Editor, context: MarkdownFileInfo | MarkdownView) => {
 		console.log(
-			BOOKKEEPER_CMD_PREFIX + "-load-data-current-file" + " CLICKED",
+			PLUGIN_NAME + "-load-data-current-file" + " CLICKED",
 		);
 	},
 };
+
+export const CreateDataFileCommand: DataWranglerCommand = {
+	id: PLUGIN_NAME + "-create-new-page",
+	name: "Create New Data File",
+	callBack: (app: App, context: DataWrangler) => {
+		CreateDataPageCallback(app, context);
+	},
+
+}
+
+export function CreateDataPageCallback(app: App, context: DataWrangler) {
+	const modal = new ImportDataModal(app, context.settings);
+	modal.open()
+
+}

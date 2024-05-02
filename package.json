@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-bookkeeper-plugin",
+	"name": "obsidian-datawrangler-plugin",
 	"version": "1.0.0",
 	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
 	"main": "main.js",
@@ -36,7 +36,9 @@
 		"typescript-eslint": "^7.8.0"
 	},
 	"dependencies": {
+		"@types/lodash": "^4.17.0",
 		"csv-parse": "^5.5.5",
+		"lodash": "^4.17.21",
 		"pnpm": "^9.0.6",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1"

@@ -89,7 +89,7 @@ export function parseCsv(contents: string, sep = ",", line = "\r"): Row[] {
 
 async function writeLedger(filepath: fs.PathLike, rows: Row[]): Promise<void> {
 	//   const heading = rows[0].header();
-	await fs.promises.writeFile(filepath, "```bookkeeper\n", { flag: "a" });
+	await fs.promises.writeFile(filepath, "```datawrangler\n", { flag: "a" });
 	await rows.forEach((element) => {
 		fs.promises.writeFile(filepath, element.toString() + "\n", {
 			flag: "a",

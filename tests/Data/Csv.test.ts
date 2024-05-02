@@ -1,28 +1,28 @@
 import { describe, test } from "@jest/globals";
 import { CSVTable } from "../../src/Data/Csv";
-import { BookKeeperColumnConfig, BookKeeperFormat, BookKeeperTableConfig } from "../../src/Data/DataModel";
+import { DataWranglerColumnConfig, DataWranglerFormat, DataWranglerTableConfig } from "../../src/Data/DataModel";
 
-function sampleConfig(): [string, BookKeeperTableConfig] {
-	const col1: BookKeeperColumnConfig = {
+function sampleConfig(): [string, DataWranglerTableConfig] {
+	const col1: DataWranglerColumnConfig = {
 		key: "Date",
-		format: BookKeeperFormat.date
+		format: DataWranglerFormat.date
 	};
-	const col2: BookKeeperColumnConfig = {
+	const col2: DataWranglerColumnConfig = {
 		key: "Label",
-		format: BookKeeperFormat.label
+		format: DataWranglerFormat.label
 	};
-	const col3: BookKeeperColumnConfig = {
+	const col3: DataWranglerColumnConfig = {
 		key: "Amount",
-		format: BookKeeperFormat.number
+		format: DataWranglerFormat.number
 	};
 	
-	const col4: BookKeeperColumnConfig = {
+	const col4: DataWranglerColumnConfig = {
 		key: "tags",
-		format: BookKeeperFormat.tag
+		format: DataWranglerFormat.tag
 	};
 	
 	
-	const config: BookKeeperTableConfig = {
+	const config: DataWranglerTableConfig = {
 		name: "Sample config",
 		columns: [col1, col2, col3, col4]
 		

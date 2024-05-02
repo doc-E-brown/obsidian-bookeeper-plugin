@@ -1,11 +1,12 @@
+import { PathLike } from "fs";
 import { App, PluginSettingTab } from "obsidian";
-import BookKeeper from "../../main";
-import { BookKeeperColumnConfig, BookKeeperFormat, BookKeeperTableConfig } from "../Data/DataModel";
+import DataWrangler from "../../main";
+import { DataWranglerColumnConfig, DataWranglerFormat, DataWranglerTableConfig } from "../Data/DataModel";
 
-export class BookKeeperSettingsTab extends PluginSettingTab {
-	plugin: BookKeeper;
+export class DataWranglerSettingsTab extends PluginSettingTab {
+	plugin: DataWrangler;
 
-	constructor(app: App, plugin: BookKeeper) {
+	constructor(app: App, plugin: DataWrangler) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -13,30 +14,33 @@ export class BookKeeperSettingsTab extends PluginSettingTab {
 	display() {
 		const { containerEl } = this;
 		containerEl.empty();
-		console.log("BookKeeperSettings Clicked");
+		console.log("DataWranglerSettings Clicked");
 	}
 }
 
 
-export default interface BookKeeperSettings {
-	tableConfigurations: BookKeeperTableConfig[]
+export default interface DataWranglerSettings {
+	dataLocation: PathLike
+	tableConfigurations: DataWranglerTableConfig[]
 }
 
-export class DefaultBookKeeperSettings implements BookKeeperSettings{
-	tableConfigurations: BookKeeperTableConfig[]; 
+export class DefaultDataWranglerSettings implements DataWranglerSettings{
+	dataLocation: PathLike;
+	tableConfigurations: DataWranglerTableConfig[]; 
 
 	constructor() {
-		const date: BookKeeperColumnConfig = {key: "Date", format: BookKeeperFormat.date};
-		const amount: BookKeeperColumnConfig = {key: "Amount", format: BookKeeperFormat.number};
-		const vendor: BookKeeperColumnConfig = {key: "Vendor", format: BookKeeperFormat.label};
-		const balance: BookKeeperColumnConfig = {key: "Balance", format: BookKeeperFormat.number};
-		const tags: BookKeeperColumnConfig = {key: "Tags", format: BookKeeperFormat.number};
+		const date: DataWranglerColumnConfig = {key: "Date", format: DataWranglerFormat.date};
+		const amount: DataWranglerColumnConfig = {key: "Amount", format: DataWranglerFormat.number};
+		const vendor: DataWranglerColumnConfig = {key: "Vendor", format: DataWranglerFormat.label};
+		const balance: DataWranglerColumnConfig = {key: "Balance", format: DataWranglerFormat.number};
+		// const tags: DataWranglerColumnConfig = {key: "Tags", format: DataWranglerFormat.tag};
 		
+		this.dataLocation = ".";
 		this.tableConfigurations = [
 			{
 				name: "Default Configuration",
 				columns: [
-					date, amount, vendor, balance, tags
+					date, amount, vendor, balance//, tags
 				]
 			}
 		]
