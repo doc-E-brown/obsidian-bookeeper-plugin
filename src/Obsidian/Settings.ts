@@ -33,14 +33,14 @@ export class DefaultDataWranglerSettings implements DataWranglerSettings{
 		const amount: DataWranglerColumnConfig = {key: "Amount", format: DataWranglerFormat.number};
 		const vendor: DataWranglerColumnConfig = {key: "Vendor", format: DataWranglerFormat.label};
 		const balance: DataWranglerColumnConfig = {key: "Balance", format: DataWranglerFormat.number};
-		// const tags: DataWranglerColumnConfig = {key: "Tags", format: DataWranglerFormat.tag};
+		const tags: DataWranglerColumnConfig = {key: "Tags", format: DataWranglerFormat.tag};
 		
 		this.dataLocation = ".";
 		this.tableConfigurations = [
 			{
 				name: "Default Configuration",
 				columns: [
-					date, amount, vendor, balance//, tags
+					date, amount, vendor, balance, tags
 				]
 			}
 		]

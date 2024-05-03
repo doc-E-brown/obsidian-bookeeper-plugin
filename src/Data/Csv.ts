@@ -6,7 +6,6 @@ export class CSVTable implements DataWranglerTable, LoadDataWranglerTable {
 	contents: DataWranglerRow[];
 
 	toMarkdown(): string {
-		console.log(this.contents)
 		let table = "|" + this.config.columns.map((val, idx, arr) => {
 			return val.key
 		}).join("|") + "|"
@@ -29,23 +28,28 @@ export class CSVTable implements DataWranglerTable, LoadDataWranglerTable {
 
 	}
 	
-	loadFromString(content: String, config: DataWranglerTableConfig, colSep=",", lineSep="\r") {
+	loadFromString(content: String, config: DataWranglerTableConfig, colSep=",", lineSep="\r\n") {
 		this.config = config;
 		this.contents = []
 		this.name = ""
-		content.split(lineSep).forEach((line, rowIdx, arr) => {
+		content.split(lineSep).forEach((line, _rowIdx, _arr) => {
 			const row: DataWranglerRow = [];
-			line.split(colSep).forEach((col, colIdx, lineArr) => {
+			let cells = line.replace(lineSep, "").split(colSep);
+			
+			if (cells.length == 1) {return;}
+			
+			const hasTags = line.indexOf("#") >= 0
+			
+			// Check if there are no tags in the table
+			if (!hasTags){ cells.push("") }
+			cells.forEach((col, colIdx, _lineArr) => {
 				const cell: DataWranglerCell = {
 					config: config.columns[colIdx],
 					value: parseFormat(col, config.columns[colIdx].format)
 				};
 				row.push(cell);
 			})
-			// Only add valid rows
-			if (row.length == config.columns.length) {
-				this.contents.push(row)
-			}
+			this.contents.push(row)
 		})
 	}
 }

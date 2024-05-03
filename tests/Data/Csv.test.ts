@@ -37,7 +37,7 @@ describe("Test CSVTable", () => {
 	test('Test load from string', () => {
 		const [content, config] = sampleConfig() ;
 		const table = new CSVTable();
-		table.loadFromString(content, config);
+		table.loadFromString(content, config, ",", "\r");
 
 		expect(table.config).toStrictEqual(config);
 		expect(table.contents[0][0].value).toStrictEqual(new Date("2024-05-01"))
@@ -47,5 +47,17 @@ describe("Test CSVTable", () => {
 		expect(table.contents[1][1].value).toBe("some label")
 		expect(table.contents[1][2].value).toBe(123.45)
 		expect(table.contents[1][3].value).toStrictEqual(["#tag1", "#tag2"])
+	})
+	
+	test("Test load from string without tags", () => {
+		const [_content, config] = sampleConfig();
+
+		const content = "2024-05-01,\"label\",\"175.25\"\r2023-12-03,\"some label\",\"123.45\""
+
+		const table = new CSVTable();
+		table.loadFromString(content, config, ",", "\r");
+		
+		expect(table.contents[0][3].value).toStrictEqual([])
+		expect(table.contents[1][3].value).toStrictEqual([])
 	})
 })
