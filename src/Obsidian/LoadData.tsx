@@ -1,4 +1,4 @@
-import { App, FileSystemAdapter, Modal } from "obsidian";
+import { App, Modal } from "obsidian";
 import { useState } from "react";
 import { CSVTable } from "../Data/Csv";
 import { DataWranglerTableConfig } from "../Data/DataModel";
@@ -17,7 +17,7 @@ export default function LoadDataComponent({app, tableConfigurations, modal}: Pro
 	const [validFormReason, setValidFormReason] = useState("");
 
 
-	const options = tableConfigurations.map((config, idx, arr) => {
+	const options = tableConfigurations.map((config, idx, _arr) => {
 		return <option value={idx} key={idx}>{config.name}</option>
 	})
 	
@@ -41,12 +41,10 @@ export default function LoadDataComponent({app, tableConfigurations, modal}: Pro
 			const records = new CSVTable();
 			records.name = dataFile.name;
 			records.loadFromString(data, config);
-			
 			const mdContents = records.toMarkdown();
-			const fsAdapter = new FileSystemAdapter();
 			
 			const newPath = filePath + ".md";
-			await app.vault.create(newPath, mdContents).then(()=>{console.log("done");})
+			await app.vault.create(newPath, mdContents);
 			modal.close()
 		}
 		
